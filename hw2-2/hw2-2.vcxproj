@@ -13,8 +13,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{92fbd4b6-b371-475d-952f-42743525e670}</ProjectGuid>
-    <RootNamespace>EmptyViewer</RootNamespace>
+    <ProjectGuid>{D3790355-A1F3-47C8-9140-0057B76C28B6}</ProjectGuid>
+    <RootNamespace>hw2-2</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

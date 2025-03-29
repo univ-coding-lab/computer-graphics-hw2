@@ -6,3 +6,6 @@ OpenglViewer.sln을 실행시킨 후 Main_EmptyViewer.cpp파일을 실행하면 
 ## 스크린샷
 ### Q1
 ![img.png](img.png)
+
+### Q2
+![img_1.png](img_1.png)

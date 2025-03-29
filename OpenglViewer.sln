@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hw2-1", "hw2-1\hw2-1.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hw2-2", "hw2-2\hw2-2.vcxproj", "{D3790355-A1F3-47C8-9140-0057B76C28B6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hw2-3", "hw2-3\hw2-3.vcxproj", "{992FB8F9-6848-4FF5-AFF1-4AA2FF7C2FB0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -21,6 +23,10 @@ Global
 		{D3790355-A1F3-47C8-9140-0057B76C28B6}.Debug|x86.Build.0 = Debug|Win32
 		{D3790355-A1F3-47C8-9140-0057B76C28B6}.Release|x86.ActiveCfg = Release|Win32
 		{D3790355-A1F3-47C8-9140-0057B76C28B6}.Release|x86.Build.0 = Release|Win32
+		{992FB8F9-6848-4FF5-AFF1-4AA2FF7C2FB0}.Debug|x86.ActiveCfg = Debug|Win32
+		{992FB8F9-6848-4FF5-AFF1-4AA2FF7C2FB0}.Debug|x86.Build.0 = Debug|Win32
+		{992FB8F9-6848-4FF5-AFF1-4AA2FF7C2FB0}.Release|x86.ActiveCfg = Release|Win32
+		{992FB8F9-6848-4FF5-AFF1-4AA2FF7C2FB0}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

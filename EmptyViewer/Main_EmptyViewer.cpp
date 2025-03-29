@@ -31,8 +31,23 @@ std::vector<float> OutputImage;
 
 GLuint texID;
 
-void render()
-{
+Vec3 phongShading(const Vec3& point, const Vec3& normal, const Vec3& viewDir,
+    const Light& light, const Material& mat) {
+    Vec3 lightDir = (light.position - point).normalized();
+    Vec3 reflectDir = (normal * 2.0f * normal.dot(lightDir) - lightDir).normalized();
+
+    Vec3 ambient = mat.ka * light.intensity;
+
+    float diff = std::max(normal.dot(lightDir), 0.0f);
+    Vec3 diffuse = mat.kd * diff * light.intensity;
+
+    float spec = std::pow(std::max(reflectDir.dot(viewDir), 0.0f), mat.specular_power);
+    Vec3 specular = mat.ks * spec * light.intensity;
+
+    return ambient + diffuse + specular;
+}
+
+void render() {
     Camera camera(
         Vec3(0, 0, 0),
         Vec3(1, 0, 0),
@@ -45,24 +60,49 @@ void render()
     );
 
     Scene scene;
-    scene.addObject(new Sphere(Vec3(-4, 0, -7), 1));
-    scene.addObject(new Sphere(Vec3(0, 0, -7), 2));
-    scene.addObject(new Sphere(Vec3(4, 0, -7), 1));
-    scene.addObject(new Plane(-2));
+
+    auto* s1 = new Sphere(Vec3(-4, 0, -7), 1);
+    s1->material = { {0.2f, 0.0f, 0.0f}, {1, 0, 0}, {0, 0, 0}, 0 };
+
+    auto* s2 = new Sphere(Vec3(0, 0, -7), 2);
+    s2->material = { {0, 0.2f, 0}, {0, 0.5f, 0}, {0.5f, 0.5f, 0.5f}, 32 };
+
+    auto* s3 = new Sphere(Vec3(4, 0, -7), 1);
+    s3->material = { {0, 0, 0.2f}, {0, 0, 1}, {0, 0, 0}, 0 };
+
+    auto* plane = new Plane(-2);
+    plane->material = { {0.2f, 0.2f, 0.2f}, {1, 1, 1}, {0, 0, 0}, 0 };
+
+    scene.addObject(s1);
+    scene.addObject(s2);
+    scene.addObject(s3);
+    scene.addObject(plane);
+
+    Light light = { Vec3(-4, 4, -3), Vec3(1, 1, 1) };
+
+    OutputImage.clear();
+    OutputImage.reserve(Width * Height * 3);
 
     for (int j = 0; j < Height; ++j) {
         for (int i = 0; i < Width; ++i) {
             Ray ray = camera.generateRay(i, j);
-            if (scene.closestIntersection(ray)) {
-                OutputImage.push_back(255);
-                OutputImage.push_back(255);
-                OutputImage.push_back(255);
+            HitInfo hit = scene.closestIntersection(ray);
+
+            Vec3 hitColor(0, 0, 0);
+
+            if (hit.hit) {
+                if (scene.isInShadow(hit.point, light)) {
+                    hitColor = hit.object->material.ka * light.intensity;
+                }
+                else {
+                    Vec3 viewDir = -ray.direction;
+                    hitColor = phongShading(hit.point, hit.normal, viewDir, light, hit.object->material);
+                }
             }
-            else {
-                OutputImage.push_back(0);
-                OutputImage.push_back(0);
-                OutputImage.push_back(0);
-            }
+
+            OutputImage.push_back(std::min(hitColor.x, 1.0f));
+            OutputImage.push_back(std::min(hitColor.y, 1.0f));
+            OutputImage.push_back(std::min(hitColor.z, 1.0f));
         }
     }
 }

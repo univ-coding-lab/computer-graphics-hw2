@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 #include <GL/GL.h>
 #include <GL/freeglut.h>
+#include <random>
 
 #define GLFW_INCLUDE_GLU
 #define GLFW_DLL
@@ -83,30 +84,49 @@ void render() {
     OutputImage.clear();
     OutputImage.reserve(Width * Height * 3);
 
+    int samplesPerPixel = 64;
+    std::default_random_engine rng;
+    std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+
     for (int j = 0; j < Height; ++j) {
         for (int i = 0; i < Width; ++i) {
-            Ray ray = camera.generateRay(i, j);
-            HitInfo hit = scene.closestIntersection(ray);
+            Vec3 pixelColor(0, 0, 0);
 
-            Vec3 hitColor(0, 0, 0);
+            for (int s = 0; s < samplesPerPixel; ++s) {
+                float u_offset = dist(rng);
+                float v_offset = dist(rng);
 
-            if (hit.hit) {
-                if (scene.isInShadow(hit.point, light)) {
-                    hitColor = hit.object->material.ka * light.intensity;
+                float u_scalar = camera.l + (camera.r - camera.l) * (i + u_offset) / camera.nx;
+                float v_scalar = camera.b + (camera.t - camera.b) * (j + v_offset) / camera.ny;
+
+                Vec3 direction = (camera.u * u_scalar) + (camera.v * v_scalar) - (camera.w * camera.d);
+                Ray ray(camera.eye, direction.normalized());
+
+                HitInfo hit = scene.closestIntersection(ray);
+                Vec3 sampleColor(0, 0, 0);
+
+                if (hit.hit) {
+                    if (scene.isInShadow(hit.point, light)) {
+                        sampleColor = hit.object->material.ka * light.intensity;
+                    }
+                    else {
+                        Vec3 viewDir = -ray.direction;
+                        sampleColor = phongShading(hit.point, hit.normal, viewDir, light, hit.object->material);
+                    }
                 }
-                else {
-                    Vec3 viewDir = -ray.direction;
-                    hitColor = phongShading(hit.point, hit.normal, viewDir, light, hit.object->material);
-                }
+
+                pixelColor += sampleColor;
             }
 
-            auto gammaCorrect = [](float c) {
-                return std::pow(c, 1.0f / 2.2f);
-            };
+            pixelColor = pixelColor / float(samplesPerPixel);
 
-            OutputImage.push_back(gammaCorrect(std::min(hitColor.x, 1.0f)));
-            OutputImage.push_back(gammaCorrect(std::min(hitColor.y, 1.0f)));
-            OutputImage.push_back(gammaCorrect(std::min(hitColor.z, 1.0f)));
+            auto gammaCorrect = [](float c) {
+                return std::pow(std::min(c, 1.0f), 1.0f / 2.2f);
+                };
+
+            OutputImage.push_back(gammaCorrect(pixelColor.x));
+            OutputImage.push_back(gammaCorrect(pixelColor.y));
+            OutputImage.push_back(gammaCorrect(pixelColor.z));
         }
     }
 }
